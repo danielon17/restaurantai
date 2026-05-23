@@ -1,0 +1,129 @@
+openapi: 3.0.0
+info:
+  title: RestaurantAI API
+  description: |
+    API for RestaurantAI - AI-powered restaurant management system.
+    
+    ## Authentication
+    All endpoints require Bearer token in Authorization header
+  version: 1.0.0
+
+servers:
+  - url: https://api.restaurantai.com/v1
+    description: Production
+  - url: http://localhost:3001/v1
+    description: Development
+
+tags:
+  - name: Auth
+    description: Authentication
+  - name: Restaurants
+    description: Restaurant Management
+  - name: Menu
+    description: Menu Items
+  - name: Sales
+    description: Orders & Sales
+  - name: AI
+    description: AI Recommendations
+  - name: Analytics
+    description: Reports
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, first_name, last_name]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+      responses:
+        201:
+          description: User created
+
+  /restaurants:
+    get:
+      tags: [Restaurants]
+      security:
+        - BearerAuth: []
+      summary: List restaurants
+      responses:
+        200:
+          description: List of restaurants
+
+    post:
+      tags: [Restaurants]
+      security:
+        - BearerAuth: []
+      summary: Create restaurant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                industry:
+                  type: string
+      responses:
+        201:
+          description: Restaurant created
+
+  /restaurants/{restaurant_id}/menu-items:
+    get:
+      tags: [Menu]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: restaurant_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Menu items
+
+  /restaurants/{restaurant_id}/ai/analyze:
+    post:
+      tags: [AI]
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: restaurant_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                agent_type:
+                  type: string
+      responses:
+        200:
+          description: Analysis results
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
